@@ -1,0 +1,78 @@
+# Stock watcher configuration
+#
+# detection: any non-empty list of checks = in stock.
+#   text_present   — element contains any of these strings (case-insensitive)
+#   text_absent    — and none of these strings (case-insensitive)
+#   css_present    — selector matches on the page
+#   css_absent     — selector does NOT match
+#
+# Use --dump <n> to inspect a rendered page and tune checks.
+
+ntfy:
+  # Subscribe to this topic in the ntfy app. Treat it as a password —
+  # anyone who knows the string can send you pushes.
+  topic: "stock-zelda-19e54b"
+  # Leave server as-is unless you self-host.
+  server: "https://ntfy.sh"
+  # Title prefix for push notifications.
+  title_prefix: "IN STOCK"
+
+# Seconds between full sweeps of all 6 URLs, plus a random jitter of
+# up to ±jitter seconds added to each wait (humanizes the rhythm).
+interval: 30
+jitter: 8
+
+# Per-page load timeout and action timeout (seconds).
+page_timeout: 45
+action_timeout: 15
+
+# User agent override for plain-Chromium engines. Leave empty for cloak —
+# its own UA is part of its coherent Windows fingerprint.
+user_agent: ""
+
+stores:
+  bestbuy_controller:
+    url: "https://www.bestbuy.com/product/nintendo-switch-2-pro-controller-the-legend-of-zelda-40th-anniversary-edition-multi/J7GSL57W27"
+    # Heavy SPA: needs a longer settle before the buy button renders.
+    settle_ms: 8000
+    checks:
+      - text_present: ["Add to Cart"]
+        text_absent: ["Sold Out", "Coming Soon", "Check Stores"]
+        css_present: "[data-button-state='ADD_TO_CART'], button[data-sku-id='J7GSL57W27']"
+
+  gamestop_controller:
+    url: "https://www.gamestop.com/gaming-accessories/controllers/nintendo-switch-2/products/nintendo-switch-2-pro-controller-the-legend-of-zelda---40th-anniversary-edition/451609.html?20t75="
+    checks:
+      - text_present: ["Add to Cart"]
+        text_absent: ["Sold Out", "Out of Stock", "Notify Me"]
+        css_present: "#add-to-cart, button[data-testid='add-to-cart']"
+
+  nintendo_controller:
+    url: "https://www.nintendo.com/us/store/products/nintendo-switch-2-pro-controller-the-legend-of-zelda-40th-anniversary-edition-127074/"
+    checks:
+      - text_present: ["Add To Cart"]
+        text_absent: ["Sold Out", "Sold out", "Out of stock", "Notify me"]
+        css_present: "button[data-testid='add-to-cart'], .add-to-cart button"
+
+  nintendo_stand:
+    url: "https://www.nintendo.com/us/store/products/nintendo-switch-2-pro-controller-display-stand-the-legend-of-zelda-40th-anniversary-edition-127076/"
+    checks:
+      - text_present: ["Add To Cart"]
+        text_absent: ["Sold Out", "Sold out", "Out of stock", "Notify me"]
+        css_present: "button[data-testid='add-to-cart'], .add-to-cart button"
+
+  target_console:
+    url: "https://www.target.com/p/nintendo-8482-switch-2-the-legend-of-zelda-40th-anniversary-edition-console-system/-/A-1013213521"
+    checks:
+      - text_present: ["Add to cart"]
+        text_absent: ["Sold out", "Out of stock", "See details", "Currently out of stock"]
+        css_present: "[data-test='orderCarryoverButton'], button[data-test='checkout']"
+
+  walmart_controller:
+    url: "https://www.walmart.com/ip/Nintendo-Switch-2-Pro-Controller-The-Legend-of-Zelda-40th-anniversary-Edition/20954470204"
+    # Walmart's bot check wants a coherent Windows font set.
+    fingerprint: "windows"
+    checks:
+      - text_present: ["Add to cart"]
+        text_absent: ["Out of stock", "Get notified", "Add to list", "See similar"]
+        css_present: "button[data-tl-id='AddToCartMiniCart'], button[data-testid='add-to-cart']"

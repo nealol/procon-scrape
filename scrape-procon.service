@@ -1,0 +1,15 @@
+[Unit]
+Description=Zelda restock watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/scrape-procon
+EnvironmentFile=/opt/scrape-procon/.env
+ExecStart=/usr/bin/node watch.js
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
